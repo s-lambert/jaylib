@@ -1,4 +1,7 @@
+#define RAYGUI_IMPLEMENTATION
+
 #include <raylib.h>
+#include <raygui.h>
 #include <rlgl.h>
 #include <janet.h>
 
@@ -13,6 +16,7 @@
 #include "3d.h"
 #include "rlgl.h"
 #include "shader.h"
+#include "gui.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "jaylib", core_cfuns);
@@ -24,4 +28,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "jaylib", threed_cfuns);
     janet_cfuns(env, "jaylib", rlgl_cfuns);
     janet_cfuns(env, "jaylib", shader_cfuns);
+    janet_register_abstract_type(&GuiBoolean_type);
+    janet_register_abstract_type(&GuiInteger_type);
+    janet_cfuns(env, "jaylib", gui_cfuns);
 }
