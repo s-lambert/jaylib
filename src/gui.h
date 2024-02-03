@@ -402,8 +402,14 @@ static Janet cfun_GuiGrid(int32_t argc, Janet *argv)
     const char *text = jaylib_getcstring(argv, 1);
     float spacing = (float)janet_getnumber(argv, 2);
     int subdivs = janet_getinteger(argv, 3);
-    Vector2 mouse_cell = janet_getarray(argv, 4);
+    Vector2 mouse_cell = jaylib_getvec2(argv, 4);
     bool result = GuiGrid(bounds, text, spacing, subdivs, &mouse_cell);
+
+    // Write back mouse_cell values to the Janet array.
+    JanetArray *array = janet_getarray(argv, 4);
+    array->data[0] = janet_wrap_number(mouse_cell.x);
+    array->data[1] = janet_wrap_number(mouse_cell.y);
+
     return janet_wrap_boolean(result);
 }
 
