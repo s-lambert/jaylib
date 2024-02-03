@@ -17,6 +17,8 @@
 (var text_input @"text")
 (var slider_value (gui-float 1.5))
 (var selected_cell @[-1 -1])
+(var list_scroll (gui-integer 0))
+(var selected_list (gui-integer -1))
 
 (while (not (window-should-close))
   (begin-drawing)
@@ -47,7 +49,7 @@
   (gui-status-bar [0 575 800 25] "STATUS")
   (gui-dummy-rec [0 350 50 25] "BOX")
   (gui-grid [0 375 100 100] "GRID" (number_input :value) (math/round (slider_value :value)) selected_cell)
-
+  (gui-list-view [200 0 50 100] "ONE;TWO;THREE;FOUR;FIVE;SIX" list_scroll selected_list)
   # Unlock and then render the dropdown so it's still interactable
   (gui-unlock)
 

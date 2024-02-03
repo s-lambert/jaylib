@@ -413,6 +413,25 @@ static Janet cfun_GuiGrid(int32_t argc, Janet *argv)
     return janet_wrap_boolean(result);
 }
 
+static Janet cfun_GuiListView(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 4);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *text = jaylib_getcstring(argv, 1);
+    if (!janet_checktype(argv[2], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiInteger as the third argument.");
+    }
+    GuiInteger *scroll_index = janet_getabstract(argv, 2, &GuiInteger_type);
+    if (!janet_checktype(argv[2], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiInteger as the fourth argument.");
+    }
+    GuiInteger *active = janet_getabstract(argv, 3, &GuiInteger_type);
+    bool result = GuiListView(bounds, text, &scroll_index->value, &active->value);
+    return janet_wrap_boolean(result);
+}
+
 static JanetReg gui_cfuns[] = {
     {"gui-boolean", cfun_GuiBoolean, NULL},
     {"gui-integer", cfun_GuiInteger, NULL},
@@ -421,6 +440,7 @@ static JanetReg gui_cfuns[] = {
     {"gui-lock", cfun_GuiLock, NULL},
     {"gui-unlock", cfun_GuiUnlock, NULL},
 
+    // Basic controls
     {"gui-label", cfun_GuiLabel, NULL},
     {"gui-button", cfun_GuiButton, NULL},
     {"gui-label-button", cfun_GuiLabelButton, NULL},
@@ -441,4 +461,7 @@ static JanetReg gui_cfuns[] = {
     {"gui-status-bar", cfun_GuiStatusBar, NULL},
     {"gui-dummy-rec", cfun_GuiDummyRec, NULL},
     {"gui-grid", cfun_GuiGrid, NULL},
+
+    // Advanced controls
+    {"gui-list-view", cfun_GuiListView, NULL},
     {NULL, NULL, NULL}};
