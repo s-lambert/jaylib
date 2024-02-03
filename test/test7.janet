@@ -15,9 +15,13 @@
 (var number_input (gui-integer 5))
 (var editing_text false)
 (var text_input @"text")
+(var slider_value (gui-float 1.5))
+
+(print (slider_value :value))
 
 (while (not (window-should-close))
   (begin-drawing)
+
   (clear-background [0 0 0])
 
   # Lock the UI while the dropdown is open
@@ -36,16 +40,18 @@
   (if (gui-value-box [0 225 75 25] "NUMBER" number_input 0 10 editing_number)
     (set editing_number (not editing_number)))
   (gui-spinner [125 0 75 25] "SPINNER" loading_spinner 0 100 false)
-
   (if (gui-text-box [0 250 75 25] text_input 10 editing_text)
     (set editing_text (not editing_text)))
+  (gui-slider [25 275 75 25] "0" "10" slider_value 0 10)
+  (gui-slider-bar [25 300 75 25] "0" "10" slider_value 0 10)
+  (gui-progress-bar [25 325 75 25] "0" "10" slider_value 0 10)
+  (gui-status-bar [0 575 800 25] "STATUS")
 
   # Unlock and then render the dropdown so it's still interactable
   (gui-unlock)
 
   (if (gui-dropdown-box [0 200 75 25] "1;2;3" dropdown_active dropdown_open)
     (set dropdown_open (not dropdown_open)))
-
 
   (end-drawing))
 

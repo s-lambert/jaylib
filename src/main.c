@@ -30,5 +30,6 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "jaylib", shader_cfuns);
     janet_register_abstract_type(&GuiBoolean_type);
     janet_register_abstract_type(&GuiInteger_type);
+    janet_register_abstract_type(&GuiFloat_type);
     janet_cfuns(env, "jaylib", gui_cfuns);
 }

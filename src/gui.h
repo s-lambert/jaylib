@@ -1,46 +1,5 @@
 #include <stdio.h>
 
-static Janet cfun_GuiLock(int32_t argc, Janet *argv)
-{
-    janet_fixarity(argc, 0);
-    GuiLock();
-    return janet_wrap_nil();
-}
-
-static Janet cfun_GuiUnlock(int32_t argc, Janet *argv)
-{
-    janet_fixarity(argc, 0);
-    GuiUnlock();
-    return janet_wrap_nil();
-}
-
-static Janet cfun_GuiLabel(int32_t argc, Janet *argv)
-{
-    janet_fixarity(argc, 2);
-    Rectangle bounds = jaylib_getrect(argv, 0);
-    const char *text = jaylib_getcstring(argv, 1);
-    bool result = GuiLabel(bounds, text);
-    return janet_wrap_boolean(result);
-}
-
-static Janet cfun_GuiButton(int32_t argc, Janet *argv)
-{
-    janet_fixarity(argc, 2);
-    Rectangle bounds = jaylib_getrect(argv, 0);
-    const char *text = jaylib_getcstring(argv, 1);
-    bool result = GuiButton(bounds, text); // Button control, returns true when clicked
-    return janet_wrap_boolean(result);
-}
-
-static Janet cfun_GuiLabelButton(int32_t argc, Janet *argv)
-{
-    janet_fixarity(argc, 2);
-    Rectangle bounds = jaylib_getrect(argv, 0);
-    const char *text = jaylib_getcstring(argv, 1);
-    bool result = GuiLabelButton(bounds, text);
-    return janet_wrap_boolean(result);
-}
-
 typedef struct
 {
     bool value;
@@ -54,7 +13,7 @@ static int gui_boolean_get(void *ptr, Janet key, Janet *out)
         return 0;
     }
     const char *key_str = janet_unwrap_keyword(key);
-    if (!strcmp(key_str, "value"))
+    if (!janet_cstrcmp(key_str, "value"))
     {
         *out = janet_wrap_boolean(gui_boolean->value);
         return 1;
@@ -132,6 +91,103 @@ static Janet cfun_GuiInteger(int argc, Janet *argv)
     GuiInteger *gui_integer = (GuiInteger *)janet_abstract(&GuiInteger_type, sizeof(GuiInteger));
     gui_integer->value = initial_value;
     return janet_wrap_abstract(gui_integer);
+}
+
+typedef struct
+{
+    float value;
+} GuiFloat;
+
+static int gui_float_get(void *ptr, Janet key, Janet *out)
+{
+    GuiFloat *gui_float = (GuiFloat *)ptr;
+    if (!janet_checktype(key, JANET_KEYWORD))
+    {
+        return 0;
+    }
+    const char *key_str = janet_unwrap_keyword(key);
+    if (!janet_cstrcmp(key_str, "value"))
+    {
+        *out = janet_wrap_number(gui_float->value);
+        return 1;
+    }
+    return 0;
+}
+
+static void gui_float_put(void *ptr, Janet key, Janet value)
+{
+    GuiFloat *gui_float = (GuiFloat *)ptr;
+    if (!janet_checktype(key, JANET_KEYWORD))
+    {
+        janet_panic("expected keyword");
+    }
+    const char *key_str = janet_unwrap_keyword(key);
+    if (!janet_cstrcmp(key_str, "value"))
+    {
+        if (!janet_checktype(value, JANET_NUMBER))
+        {
+            janet_panic("expected number value");
+        }
+        gui_float->value = (float)janet_unwrap_number(value);
+    }
+}
+
+static const JanetAbstractType GuiFloat_type = {
+    "GuiFloat",
+    NULL,
+    NULL,
+    gui_float_get,
+    gui_float_put,
+    JANET_ATEND_PUT};
+
+static Janet cfun_GuiFloat(int argc, Janet *argv)
+{
+    janet_fixarity(argc, 1);
+    float initial_value = (float)janet_getnumber(argv, 0);
+    GuiFloat *gui_float = (GuiFloat *)janet_abstract(&GuiFloat_type, sizeof(GuiFloat));
+    gui_float->value = initial_value;
+    return janet_wrap_abstract(gui_float);
+}
+
+static Janet cfun_GuiLock(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 0);
+    GuiLock();
+    return janet_wrap_nil();
+}
+
+static Janet cfun_GuiUnlock(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 0);
+    GuiUnlock();
+    return janet_wrap_nil();
+}
+
+static Janet cfun_GuiLabel(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 2);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *text = jaylib_getcstring(argv, 1);
+    bool result = GuiLabel(bounds, text);
+    return janet_wrap_boolean(result);
+}
+
+static Janet cfun_GuiButton(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 2);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *text = jaylib_getcstring(argv, 1);
+    bool result = GuiButton(bounds, text); // Button control, returns true when clicked
+    return janet_wrap_boolean(result);
+}
+
+static Janet cfun_GuiLabelButton(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 2);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *text = jaylib_getcstring(argv, 1);
+    bool result = GuiLabelButton(bounds, text);
+    return janet_wrap_boolean(result);
 }
 
 static Janet cfun_GuiToggle(int32_t argc, Janet *argv)
@@ -270,15 +326,77 @@ static Janet cfun_GuiTextBox(int32_t argc, Janet *argv)
     return janet_wrap_boolean(result);
 }
 
+static Janet cfun_GuiSlider(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 6);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *left_text = jaylib_getcstring(argv, 1);
+    const char *right_text = jaylib_getcstring(argv, 2);
+    if (!janet_checktype(argv[3], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiFloat as the third argument.");
+    }
+    GuiFloat *gui_float = janet_getabstract(argv, 3, &GuiFloat_type);
+    float min_value = (float)janet_getnumber(argv, 4);
+    float max_value = (float)janet_getnumber(argv, 5);
+    bool result = GuiSlider(bounds, left_text, right_text, &gui_float->value, min_value, max_value);
+    return janet_wrap_boolean(result);
+}
+
+static Janet cfun_GuiSliderBar(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 6);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *left_text = jaylib_getcstring(argv, 1);
+    const char *right_text = jaylib_getcstring(argv, 2);
+    if (!janet_checktype(argv[3], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiFloat as the third argument.");
+    }
+    GuiFloat *gui_float = janet_getabstract(argv, 3, &GuiFloat_type);
+    float min_value = (float)janet_getnumber(argv, 4);
+    float max_value = (float)janet_getnumber(argv, 5);
+    bool result = GuiSliderBar(bounds, left_text, right_text, &gui_float->value, min_value, max_value);
+    return janet_wrap_boolean(result);
+}
+
+static Janet cfun_GuiProgressBar(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 6);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *left_text = jaylib_getcstring(argv, 1);
+    const char *right_text = jaylib_getcstring(argv, 2);
+    if (!janet_checktype(argv[3], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiFloat as the third argument.");
+    }
+    GuiFloat *gui_float = janet_getabstract(argv, 3, &GuiFloat_type);
+    float min_value = (float)janet_getnumber(argv, 4);
+    float max_value = (float)janet_getnumber(argv, 5);
+    bool result = GuiProgressBar(bounds, left_text, right_text, &gui_float->value, min_value, max_value);
+    return janet_wrap_boolean(result);
+}
+
+static Janet cfun_GuiStatusBar(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 2);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *text = jaylib_getcstring(argv, 1);
+    bool result = GuiStatusBar(bounds, text);
+    return janet_wrap_boolean(result);
+}
+
 static JanetReg gui_cfuns[] = {
+    {"gui-boolean", cfun_GuiBoolean, NULL},
+    {"gui-integer", cfun_GuiInteger, NULL},
+    {"gui-float", cfun_GuiFloat, NULL},
+
     {"gui-lock", cfun_GuiLock, NULL},
     {"gui-unlock", cfun_GuiUnlock, NULL},
 
     {"gui-label", cfun_GuiLabel, NULL},
     {"gui-button", cfun_GuiButton, NULL},
     {"gui-label-button", cfun_GuiLabelButton, NULL},
-    {"gui-boolean", cfun_GuiBoolean, NULL},
-    {"gui-integer", cfun_GuiInteger, NULL},
     {"gui-toggle", cfun_GuiToggle, NULL},
     {"gui-toggle-group", cfun_GuiToggleGroup, NULL},
     {"gui-toggle-slider", cfun_GuiToggleSlider, NULL},
@@ -289,4 +407,9 @@ static JanetReg gui_cfuns[] = {
     {"gui-spinner", cfun_GuiSpinner, NULL},
     {"gui-value-box", cfun_GuiValueBox, NULL},
     {"gui-text-box", cfun_GuiTextBox, NULL},
+
+    {"gui-slider", cfun_GuiSlider, NULL},
+    {"gui-slider-bar", cfun_GuiSliderBar, NULL},
+    {"gui-progress-bar", cfun_GuiProgressBar, NULL},
+    {"gui-status-bar", cfun_GuiStatusBar, NULL},
     {NULL, NULL, NULL}};
