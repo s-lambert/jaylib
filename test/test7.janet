@@ -16,13 +16,12 @@
 (var editing_text false)
 (var text_input @"text")
 (var slider_value (gui-float 1.5))
-
-(print (slider_value :value))
+(var selected_cell @[0 0])
 
 (while (not (window-should-close))
   (begin-drawing)
 
-  (clear-background [0 0 0])
+  (clear-background :white)
 
   # Lock the UI while the dropdown is open
   (if dropdown_open (gui-lock))
@@ -46,6 +45,11 @@
   (gui-slider-bar [25 300 75 25] "0" "10" slider_value 0 10)
   (gui-progress-bar [25 325 75 25] "0" "10" slider_value 0 10)
   (gui-status-bar [0 575 800 25] "STATUS")
+  (gui-dummy-rec [0 350 50 25] "BOX")
+
+  # Bug: Values modified in GuiGrid aren't communicated back to Janet
+  # Probably need to modify the janet_getindexed and modify the JanetView.
+  (gui-grid [0 375 50 50] "GRID" 1 1 selected_cell)
 
   # Unlock and then render the dropdown so it's still interactable
   (gui-unlock)

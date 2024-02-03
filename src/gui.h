@@ -386,6 +386,27 @@ static Janet cfun_GuiStatusBar(int32_t argc, Janet *argv)
     return janet_wrap_boolean(result);
 }
 
+static Janet cfun_GuiDummyRec(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 2);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *text = jaylib_getcstring(argv, 1);
+    bool result = GuiDummyRec(bounds, text);
+    return janet_wrap_boolean(result);
+}
+
+static Janet cfun_GuiGrid(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 5);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *text = jaylib_getcstring(argv, 1);
+    float spacing = (float)janet_getnumber(argv, 2);
+    int subdivs = janet_getinteger(argv, 3);
+    Vector2 mouse_cell = janet_getarray(argv, 4);
+    bool result = GuiGrid(bounds, text, spacing, subdivs, &mouse_cell);
+    return janet_wrap_boolean(result);
+}
+
 static JanetReg gui_cfuns[] = {
     {"gui-boolean", cfun_GuiBoolean, NULL},
     {"gui-integer", cfun_GuiInteger, NULL},
@@ -412,4 +433,6 @@ static JanetReg gui_cfuns[] = {
     {"gui-slider-bar", cfun_GuiSliderBar, NULL},
     {"gui-progress-bar", cfun_GuiProgressBar, NULL},
     {"gui-status-bar", cfun_GuiStatusBar, NULL},
+    {"gui-dummy-rec", cfun_GuiDummyRec, NULL},
+    {"gui-grid", cfun_GuiGrid, NULL},
     {NULL, NULL, NULL}};
