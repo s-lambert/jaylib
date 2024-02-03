@@ -432,6 +432,36 @@ static Janet cfun_GuiListView(int32_t argc, Janet *argv)
     return janet_wrap_boolean(result);
 }
 
+static Janet cfun_GuiListViewEx(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 6);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    JanetView idx = janet_getindexed(argv, 1);
+    const char **text = janet_scalloc(sizeof(const char **), (size_t)(idx.len));
+    for (unsigned i = 0; i < idx.len; i++)
+    {
+        text[i] = jaylib_getcstring(idx.items, i);
+    }
+    const int count = janet_getinteger(argv, 2);
+    if (!janet_checktype(argv[3], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiInteger as the fourth argument.");
+    }
+    GuiInteger *scroll_index = janet_getabstract(argv, 3, &GuiInteger_type);
+    if (!janet_checktype(argv[4], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiInteger as the fifth argument.");
+    }
+    GuiInteger *active = janet_getabstract(argv, 4, &GuiInteger_type);
+    if (!janet_checktype(argv[5], JANET_ABSTRACT))
+    {
+        janet_panic("Expected GuiInteger as the sixth argument.");
+    }
+    GuiInteger *focus = janet_getabstract(argv, 5, &GuiInteger_type);
+    bool result = GuiListViewEx(bounds, text, count, &scroll_index->value, &active->value, &focus->value);
+    return janet_wrap_boolean(result);
+}
+
 static JanetReg gui_cfuns[] = {
     {"gui-boolean", cfun_GuiBoolean, NULL},
     {"gui-integer", cfun_GuiInteger, NULL},
@@ -464,4 +494,5 @@ static JanetReg gui_cfuns[] = {
 
     // Advanced controls
     {"gui-list-view", cfun_GuiListView, NULL},
+    {"gui-list-view-ex", cfun_GuiListViewEx, NULL},
     {NULL, NULL, NULL}};
