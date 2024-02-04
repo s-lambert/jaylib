@@ -19,7 +19,7 @@
 (var selected_cell @[-1 -1])
 (var list_scroll (gui-integer 0))
 (var selected_list (gui-integer -1))
-(var focus_list (gui-integer -1))
+(var focus_list (gui-integer -1)) 
 
 (while (not (window-should-close))
   (begin-drawing)
@@ -52,6 +52,11 @@
   (gui-grid [0 375 100 100] "GRID" (number_input :value) (math/round (slider_value :value)) selected_cell)
   (gui-list-view [200 0 50 100] "ONE;TWO;THREE;FOUR;FIVE;SIX" list_scroll selected_list)
   (gui-list-view-ex [250 0 50 100] '("ONE" "TWO" "THREE" "FOUR" "FIVE" "SIX") 6 list_scroll selected_list focus_list)
+  (let [button-clicked (gui-message-box [300 0 200 100] "TITLE" "MESSAGE" "OK;CANCEL")]
+    (cond 
+      (= button-clicked 0) (print "clicked close button")
+      (= button-clicked 1) (print "clicked OK")
+      (= button-clicked 2) (print "clicked cancel")))
   # Unlock and then render the dropdown so it's still interactable
   (gui-unlock)
 

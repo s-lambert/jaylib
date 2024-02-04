@@ -462,6 +462,17 @@ static Janet cfun_GuiListViewEx(int32_t argc, Janet *argv)
     return janet_wrap_boolean(result);
 }
 
+static Janet cfun_GuiMessageBox(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 4);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *title = jaylib_getcstring(argv, 1);
+    const char *message = jaylib_getcstring(argv, 2);
+    const char *buttons = jaylib_getcstring(argv, 3);
+    int result = GuiMessageBox(bounds, title, message, buttons);
+    return janet_wrap_integer(result);
+}
+
 static JanetReg gui_cfuns[] = {
     {"gui-boolean", cfun_GuiBoolean, NULL},
     {"gui-integer", cfun_GuiInteger, NULL},
@@ -495,4 +506,5 @@ static JanetReg gui_cfuns[] = {
     // Advanced controls
     {"gui-list-view", cfun_GuiListView, NULL},
     {"gui-list-view-ex", cfun_GuiListViewEx, NULL},
+    {"gui-message-box", cfun_GuiMessageBox, NULL},
     {NULL, NULL, NULL}};
