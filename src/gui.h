@@ -473,6 +473,30 @@ static Janet cfun_GuiMessageBox(int32_t argc, Janet *argv)
     return janet_wrap_integer(result);
 }
 
+static Janet cfun_GuiTextInputBox(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 7);
+    Rectangle bounds = jaylib_getrect(argv, 0);
+    const char *title = jaylib_getcstring(argv, 1);
+    const char *message = jaylib_getcstring(argv, 2);
+    const char *buttons = jaylib_getcstring(argv, 3);
+    char *text = (char *)jaylib_getcstring(argv, 4);
+    const int text_max_size = janet_getinteger(argv, 5);
+    GuiBoolean *secret_view_active = NULL;
+    if (janet_checktype(argv[6], JANET_ABSTRACT))
+    {
+        secret_view_active = janet_getabstract(argv, 6, &GuiBoolean_type);
+    }
+    int result = GuiTextInputBox(bounds, title, message, buttons, text, text_max_size, &secret_view_active->value);
+
+    // Write back text changes to the Janet buffer.
+    JanetBuffer *buf = janet_unwrap_buffer(argv[4]);
+    janet_buffer_setcount(buf, 0);
+    janet_buffer_push_cstring(buf, text);
+
+    return janet_wrap_integer(result);
+}
+
 static JanetReg gui_cfuns[] = {
     {"gui-boolean", cfun_GuiBoolean, NULL},
     {"gui-integer", cfun_GuiInteger, NULL},
@@ -507,4 +531,5 @@ static JanetReg gui_cfuns[] = {
     {"gui-list-view", cfun_GuiListView, NULL},
     {"gui-list-view-ex", cfun_GuiListViewEx, NULL},
     {"gui-message-box", cfun_GuiMessageBox, NULL},
+    {"gui-text-input-box", cfun_GuiTextInputBox, NULL},
     {NULL, NULL, NULL}};
