@@ -23,6 +23,9 @@
 (var show_password (gui-boolean false))
 (var password_input @"")
 
+(def nine-patch (load-image-1 "test/nine-patch.png"))
+(def nine-patch-texture (load-texture-from-image nine-patch))
+
 (while (not (window-should-close))
   (begin-drawing)
 
@@ -64,6 +67,8 @@
       (= button-clicked 0) (print "clicked close button")
       (= button-clicked 1) (print "clicked OK")
       (= button-clicked 2) (print "clicked cancel")))
+
+  (draw-texture-n-patch nine-patch-texture [[0 0 96 96] 32 32 32 32 0] [300 300 200 200] [0 0] 0 :white)
 
   # Unlock and then render the dropdown so it's still interactable
   (gui-unlock)
