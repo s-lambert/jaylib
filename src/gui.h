@@ -531,7 +531,10 @@ static JanetReg gui_cfuns[] = {
     {"gui-check-box", cfun_GuiCheckBox, NULL},
     {"gui-combo-box", cfun_GuiComboBox, NULL},
 
-    {"gui-dropdown-box", cfun_GuiDropdownBox, NULL},
+    {"gui-dropdown-box", cfun_GuiDropdownBox,
+     "(gui-dropdown-box rect items (gui-integer active) open)\n\n"
+     "Draws a dropdown box with semi-colon separated items,\n\n"
+     "use gui-lock to prevent interaction outside of this."},
     {"gui-spinner", cfun_GuiSpinner, NULL},
     {"gui-value-box", cfun_GuiValueBox, NULL},
     {"gui-text-box", cfun_GuiTextBox, NULL},
@@ -541,7 +544,9 @@ static JanetReg gui_cfuns[] = {
     {"gui-progress-bar", cfun_GuiProgressBar, NULL},
     {"gui-status-bar", cfun_GuiStatusBar, NULL},
     {"gui-dummy-rec", cfun_GuiDummyRec, NULL},
-    {"gui-grid", cfun_GuiGrid, NULL},
+    {"gui-grid", cfun_GuiGrid,
+     "(gui-grid [pos-x pos-y bound-x bound-y] text spacing subdivs mouse-cell)\n\n"
+     "Draw a grid, mouse-cell is the current grid square that's being moused over, default to [-1 -1]"},
 
     // Advanced controls
     {"gui-list-view", cfun_GuiListView, NULL},
