@@ -149,6 +149,20 @@ static Janet cfun_GuiFloat(int argc, Janet *argv)
     return janet_wrap_abstract(gui_float);
 }
 
+static Janet cfun_GuiEnable(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 0);
+    GuiEnable();
+    return janet_wrap_nil();
+}
+
+static Janet cfun_GuiDisable(int32_t argc, Janet *argv)
+{
+    janet_fixarity(argc, 0);
+    GuiDisable();
+    return janet_wrap_nil();
+}
+
 static Janet cfun_GuiLock(int32_t argc, Janet *argv)
 {
     janet_fixarity(argc, 0);
@@ -502,6 +516,8 @@ static JanetReg gui_cfuns[] = {
     {"gui-integer", cfun_GuiInteger, NULL},
     {"gui-float", cfun_GuiFloat, NULL},
 
+    {"gui-enable", cfun_GuiEnable, NULL},
+    {"gui-disable", cfun_GuiDisable, NULL},
     {"gui-lock", cfun_GuiLock, NULL},
     {"gui-unlock", cfun_GuiUnlock, NULL},
 
